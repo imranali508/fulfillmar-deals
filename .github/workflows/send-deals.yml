@@ -1,0 +1,29 @@
+name: Send FulfillMar Deals
+
+on:
+  schedule:
+    - cron: '0 * * * *'      # at minute 0 of every hour
+  workflow_dispatch:        # allows manual trigger
+
+jobs:
+  send-deals:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: pip install requests beautifulsoup4 feedparser sendgrid schedule
+
+    - name: Run scheduler
+      env:
+        SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+        FROM_EMAIL:        ${{ secrets.FROM_EMAIL }}
+        TO_EMAIL:          ${{ secrets.TO_EMAIL }}
+      run: python scheduler.py
